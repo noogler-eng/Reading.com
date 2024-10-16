@@ -3,7 +3,6 @@ import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import firebase from "../../lib/firebase";
 import { useRecoilState } from "recoil";
 import userAtom from "../../store/user/userAtom";
-import { LogOut } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -11,6 +10,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Link } from "react-router-dom";
+import { DropdownMenuSeparator } from "@radix-ui/react-dropdown-menu";
 
 export default function LoginButton() {
   const [user, setUser] = useRecoilState(userAtom);
@@ -59,9 +60,31 @@ export default function LoginButton() {
             />
           </DropdownMenuTrigger>
           <DropdownMenuContent className="bg-black text-white font-semibold">
-            <DropdownMenuItem onClick={handelLogout} className="flex gap-2 border-none focus:outline-none">
-              logout <LogOut size={18}/>
+            <DropdownMenuItem className="flex gap-2 border-none focus:outline-none">
+              {user.email}
             </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={handelLogout}
+              className="flex gap-2 border-none focus:outline-none"
+            >
+              logout
+            </DropdownMenuItem>
+            <Link to="/">
+              <DropdownMenuItem className="flex gap-2 border-none focus:outline-none">
+                Home
+              </DropdownMenuItem>
+            </Link>
+            <Link to="/my-courses">
+              <DropdownMenuItem className="flex gap-2 border-none focus:outline-none">
+                My-courses
+              </DropdownMenuItem>
+            </Link>
+            <Link to="/subscription">
+              <DropdownMenuItem className="flex gap-2 border-none focus:outline-none">
+                Subscription
+              </DropdownMenuItem>
+            </Link>
           </DropdownMenuContent>
         </DropdownMenu>
       )}

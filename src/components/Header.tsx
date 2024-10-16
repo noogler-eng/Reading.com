@@ -5,6 +5,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import firebase from "../../lib/firebase";
 import { useRecoilState } from "recoil";
 import userAtom from "../../store/user/userAtom";
+import { Link } from "react-router-dom";
 
 export default function Header() {
   const [user, setUser] = useRecoilState(userAtom);
@@ -28,10 +29,10 @@ export default function Header() {
 
   return (
     <div className="flex items-center px-6 py-4 justify-between border-b border-gray-600">
-      <div className="text-3xl">Readers.com</div>
+      <div className="text-3xl"><Link to='/'>Readers.com</Link></div>
       <div className="flex gap-2 items-center">
-        <Button variant="secondary">My Courses</Button>
-        <Button variant="destructive">Subscribe</Button>
+        <Button variant="secondary" className="hidden md:block"><Link to='/my-courses'>My Courses</Link></Button>
+        <Button variant="destructive" className="hidden md:block"><Link to='/subscribe'>Subscribe</Link></Button>
         <LoginButton />
       </div>
     </div>

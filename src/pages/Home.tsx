@@ -3,7 +3,7 @@
 
 export default function Home(){
         
-    return <div>
+    return <div className="p-6">
         home..
     </div>
 }
