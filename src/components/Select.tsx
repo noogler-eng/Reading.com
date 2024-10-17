@@ -10,12 +10,13 @@ import {
 export function SelectScrollable({
   title,
   items,
+  handelData,
 }: {
   title: string;
   items: string[];
+  handelData: (key: string, value: string) => void;
 }) {
-
-    console.log(items);
+  console.log(items);
   return (
     <Select>
       <SelectTrigger className="w-full">
@@ -25,7 +26,11 @@ export function SelectScrollable({
         <SelectGroup>
           {items.map((item: string, index: any) => {
             return (
-              <SelectItem value={item} key={index}>
+              <SelectItem
+                value={item}
+                key={index}
+                onSelect={() => handelData(title, item)}
+              >
                 {item}
               </SelectItem>
             );

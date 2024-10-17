@@ -13,7 +13,16 @@ export default function Form() {
   const handelCreateCourse = async () => {};
 
   const user = useRecoilValue(userAtom);
-  const [des, setDes] = useState("");
+  const [data, setData] = useState<{
+    title: string;
+    desctiption: string;
+    message: string;
+    level: string;
+    category: string;
+    language: string;
+  } | null>(null);
+  const [file, setFile] = useState<File | null>(null);
+  const [des, setDes] = useState<string>("");
 
   if (!user) {
     return (
@@ -46,7 +55,8 @@ export default function Form() {
 
   const levels = ["Begginer", "Moderate", "Advanced"];
 
-  const languages = ["English"];
+  const languages = ["English", "Hindi"];
+  const handelData = (key: string, value: string) => {};
 
   return (
     <div className="p-6 flex flex-col items-center">
@@ -63,12 +73,18 @@ export default function Form() {
             className="flex flex-col items-center gap-3 justify-center z-10 text-white w-full"
           >
             <Input
-              type="email"
-              id="email"
-              placeholder="Email"
+              type="title"
+              id="title"
+              placeholder="title"
               className="w-5/6"
+              required
+              onChange={(e) => handelData("title", e.target.value)}
             />
-            <Textarea placeholder="Type your message here." className="w-5/6" />
+            <Textarea
+              placeholder="Type your message here."
+              className="w-5/6"
+              onChange={(e) => handelData("message", e.target.value)}
+            />
             <div className="w-5/6">
               <div className="flex items-center justify-center w-full bg-black">
                 <label
@@ -99,14 +115,34 @@ export default function Form() {
                       SVG, PNG, JPG or GIF (MAX. 800x400px)
                     </p>
                   </div>
-                  <input id="dropzone-file" type="file" className="hidden" />
+                  <input
+                    id="dropzone-file"
+                    type="file"
+                    className="hidden"
+                    required
+                    onChange={(e) =>
+                      setFile(e.target.files ? e.target.files[0] : null)
+                    }
+                  />
                 </label>
               </div>
             </div>
             <div className="w-5/6 flex gap-3">
-              <SelectScrollable title={"category"} items={categories} />
-              <SelectScrollable title={"level"} items={levels} />
-              <SelectScrollable title={"language"} items={languages} />
+              <SelectScrollable
+                title={"category"}
+                items={categories}
+                handelData={handelData}
+              />
+              <SelectScrollable
+                title={"level"}
+                items={levels}
+                handelData={handelData}
+              />
+              <SelectScrollable
+                title={"language"}
+                items={languages}
+                handelData={handelData}
+              />
             </div>
             <div className="w-5/6 rounded-xl">
               <ReactQuill
