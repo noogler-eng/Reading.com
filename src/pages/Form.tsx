@@ -5,11 +5,15 @@ import userAtom from "../../store/user/userAtom";
 import { useRecoilValue } from "recoil";
 import ShineBorder from "@/components/ui/shine-border";
 import { SelectScrollable } from "@/components/Select";
+import ReactQuill from "react-quill";
+import { useState } from "react";
+import "react-quill/dist/quill.snow.css";
 
 export default function Form() {
   const handelCreateCourse = async () => {};
 
   const user = useRecoilValue(userAtom);
+  const [des, setDes] = useState("");
 
   if (!user) {
     return (
@@ -24,14 +28,34 @@ export default function Form() {
     );
   }
 
+  const categories = [
+    "Development",
+    "Business",
+    "Finance & Accounting",
+    "IT & Software",
+    "Office Productivity",
+    "Personal Development",
+    "Design",
+    "Marketing",
+    "Lifestyle",
+    "Photography & Video",
+    "Health & Fitness",
+    "Music",
+    "Teaching",
+  ];
+
+  const levels = ["Begginer", "Moderate", "Advanced"];
+
+  const languages = ["English"];
+
   return (
     <div className="p-6 flex flex-col items-center">
       <ShineBorder
         className="w-4/6 p-4 my-10 bg-transparent rounded-xl"
         color={["#A07CFE", "#FE8FB5", "#FFBE7B"]}
       >
-        <div className="w-full flex flex-col items-center">
-          <h1 className="text-3xl font-extrabold bg-gradient-to-b from-gray-200 to-gray-900 bg-clip-text text-transparent mb-10">
+        <div className="w-full flex flex-col items-center p-10">
+          <h1 className="text-3xl font-extrabold bg-gradient-to-b from-gray-200 to-gray-900 bg-clip-text text-transparent mb-10 underline">
             Create New Course
           </h1>
           <form
@@ -80,11 +104,19 @@ export default function Form() {
               </div>
             </div>
             <div className="w-5/6 flex gap-3">
-              <SelectScrollable title={'category'}/>
-              <SelectScrollable title={'level'}/>
-              <SelectScrollable title={'language'}/>
+              <SelectScrollable title={"category"} items={categories} />
+              <SelectScrollable title={"level"} items={levels} />
+              <SelectScrollable title={"language"} items={languages} />
             </div>
-            <Button type="submit" variant={"secondary"}>
+            <div className="w-5/6 rounded-xl">
+              <ReactQuill
+                theme="snow"
+                value={des}
+                onChange={setDes}
+                className="rounded-xl"
+              />
+            </div>
+            <Button type="submit" variant={"secondary"} className="w-5/6">
               create
             </Button>
           </form>
