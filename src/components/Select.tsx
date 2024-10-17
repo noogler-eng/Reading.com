@@ -16,21 +16,16 @@ export function SelectScrollable({
   items: string[];
   handelData: (key: string, value: string) => void;
 }) {
-  console.log(items);
   return (
-    <Select>
+    <Select onValueChange={(value) => handelData(title, value)}>
       <SelectTrigger className="w-full">
-        <SelectValue placeholder={`Select a ${title}`} />
+        <SelectValue placeholder={`${title}`} />
       </SelectTrigger>
       <SelectContent className="bg-black text-white">
         <SelectGroup>
           {items.map((item: string, index: any) => {
             return (
-              <SelectItem
-                value={item}
-                key={index}
-                onSelect={() => handelData(title, item)}
-              >
+              <SelectItem value={item} key={index}>
                 {item}
               </SelectItem>
             );

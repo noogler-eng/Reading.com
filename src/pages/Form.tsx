@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import userAtom from "../../store/user/userAtom";
@@ -8,10 +7,9 @@ import { SelectScrollable } from "@/components/Select";
 import ReactQuill from "react-quill";
 import { useState } from "react";
 import "react-quill/dist/quill.snow.css";
+import { RainbowButton } from "@/components/ui/rainbow-button";
 
 export default function Form() {
-  const handelCreateCourse = async () => {};
-
   const user = useRecoilValue(userAtom);
   const [data, setData] = useState<{
     title: string;
@@ -20,9 +18,12 @@ export default function Form() {
     level: string;
     category: string;
     language: string;
+    price: string;
+    sellPrice: string;
   } | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [des, setDes] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
   if (!user) {
     return (
@@ -52,20 +53,38 @@ export default function Form() {
     "Music",
     "Teaching",
   ];
-
   const levels = ["Begginer", "Moderate", "Advanced"];
-
   const languages = ["English", "Hindi"];
-  const handelData = (key: string, value: string) => {};
+
+  // using [] means telling js to use the value of key instaed taking init
+  const handelData = (key: string, value: string) => {
+    setData((data: any) => {
+      return {
+        ...data,
+        [key]: value,
+      };
+    });
+  };
+
+  // final form submission
+  const handelCreateCourse = async (e: any) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+    } catch (error) {
+      console.log("error while creating the form", error);
+    }
+    setLoading(false);
+  };
 
   return (
-    <div className="p-6 flex flex-col items-center">
+    <div className="p-6 flex flex-col items-center w-full">
       <ShineBorder
         className="w-4/6 p-4 my-10 bg-transparent rounded-xl"
         color={["#A07CFE", "#FE8FB5", "#FFBE7B"]}
       >
-        <div className="w-full flex flex-col items-center p-10">
-          <h1 className="text-3xl font-extrabold bg-gradient-to-b from-gray-200 to-gray-900 bg-clip-text text-transparent mb-10 underline">
+        <div className="p-2 md:p-10 w-full flex flex-col items-center">
+          <h1 className="text-xl md:text-5xl font-extrabold bg-gradient-to-b from-gray-200 to-gray-900 bg-clip-text text-transparent mb-10 underline">
             Create New Course
           </h1>
           <form
@@ -79,55 +98,27 @@ export default function Form() {
               className="w-5/6"
               required
               onChange={(e) => handelData("title", e.target.value)}
+              disabled={loading}
             />
             <Textarea
               placeholder="Type your message here."
               className="w-5/6"
               onChange={(e) => handelData("message", e.target.value)}
+              disabled={loading}
             />
             <div className="w-5/6">
-              <div className="flex items-center justify-center w-full bg-black">
-                <label
-                  htmlFor="dropzone-file"
-                  className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer  dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600 bg-black"
-                >
-                  <div className="flex flex-col items-center justify-center pt-5 pb-6 bg-black">
-                    <svg
-                      className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
-                      aria-hidden="true"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 20 16"
-                    >
-                      <path
-                        stroke="currentColor"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
-                      />
-                    </svg>
-                    <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                      <span className="font-semibold">Click to upload</span> or
-                      drag and drop
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      SVG, PNG, JPG or GIF (MAX. 800x400px)
-                    </p>
-                  </div>
-                  <input
-                    id="dropzone-file"
-                    type="file"
-                    className="hidden"
-                    required
-                    onChange={(e) =>
-                      setFile(e.target.files ? e.target.files[0] : null)
-                    }
-                  />
-                </label>
-              </div>
+              <input
+                id="dropzone-file"
+                type="file"
+                className="w-full border rounded-lg p-2"
+                required
+                onChange={(e) =>
+                  setFile(e.target.files ? e.target.files[0] : null)
+                }
+                disabled={loading}
+              />
             </div>
-            <div className="w-5/6 flex gap-3">
+            <div className="w-5/6 flex flex-col md:flex-row gap-3">
               <SelectScrollable
                 title={"category"}
                 items={categories}
@@ -145,6 +136,7 @@ export default function Form() {
               />
             </div>
             <div className="w-5/6 rounded-xl">
+              {/* this gives us an html code */}
               <ReactQuill
                 theme="snow"
                 value={des}
@@ -152,9 +144,29 @@ export default function Form() {
                 className="rounded-xl"
               />
             </div>
-            <Button type="submit" variant={"secondary"} className="w-5/6">
+            <div className="flex flex-col md:flex-row gap-3 w-5/6">
+              <Input
+                type="text"
+                id="price"
+                placeholder="price"
+                className="w-5/6"
+                required
+                onChange={(e) => handelData("price", e.target.value)}
+                disabled={loading}
+              />
+              <Input
+                type="price"
+                id="price"
+                placeholder="sell-price"
+                className="w-5/6"
+                required
+                onChange={(e) => handelData("sellPrice", e.target.value)}
+                disabled={loading}
+              />
+            </div>
+            <RainbowButton type="submit" disabled={loading} className="w-5/6">
               create
-            </Button>
+            </RainbowButton>
           </form>
         </div>
       </ShineBorder>
