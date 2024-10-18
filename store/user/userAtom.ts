@@ -1,6 +1,8 @@
 import { atom } from "recoil";
 
 const userAtom = atom<{
+    id: string,
+    name: string,
     email: string,
     image: string
 } | null>({

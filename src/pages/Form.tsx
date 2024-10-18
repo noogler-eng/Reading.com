@@ -9,18 +9,14 @@ import { useState } from "react";
 import "react-quill/dist/quill.snow.css";
 import { RainbowButton } from "@/components/ui/rainbow-button";
 
+import firebaseCourse from "../../lib/serverless/courses";
+import CourseData from "lib/types/courseData";
+import InstData from "lib/types/InstData";
+
 export default function Form() {
   const user = useRecoilValue(userAtom);
-  const [data, setData] = useState<{
-    title: string;
-    desctiption: string;
-    message: string;
-    level: string;
-    category: string;
-    language: string;
-    price: string;
-    sellPrice: string;
-  } | null>(null);
+  
+  const [data, setData] = useState<CourseData | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [des, setDes] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -71,6 +67,14 @@ export default function Form() {
     e.preventDefault();
     setLoading(true);
     try {
+      if(!data || !file || !des) throw new Error("data can't be null");
+      const instData: InstData = {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        photoUrl: user.image
+      }
+      await firebaseCourse.createCourse(data, file, des, instData);
     } catch (error) {
       console.log("error while creating the form", error);
     }

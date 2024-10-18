@@ -19,10 +19,13 @@ export default function LoginButton() {
   const handelLogin = async () => {
     signInWithPopup(firebase.auth, new GoogleAuthProvider()).then(
       (user: any) => {
+        console.log('user ', user)
         if (user) {
           setUser({
-            email: user.email,
-            image: user.photoURL,
+            id: user.user.uid,
+            name: user.user.displayName,
+            email: user.user.email,
+            image: user.user.photoURL,
           });
         } else {
           setUser(null);
@@ -30,6 +33,7 @@ export default function LoginButton() {
       }
     );
   };
+
 
   const handelLogout = async () => {
     signOut(firebase.auth)
