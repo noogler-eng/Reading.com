@@ -1,75 +1,48 @@
-// import { useRecoilValue } from "recoil";
-// import userAtom from "../../store/user/userAtom";
-
 import { MarqueeDemo } from "@/components/Marquee";
-import firebaseCourse from "../../lib/serverless/courses";
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { Avatar } from "@radix-ui/react-avatar";
+import FetchAllCourses from "../../lib/hooks/FetchAllC";
+import AnimatedGridPattern from "@/components/ui/animated-grid-pattern";
+import CourseCard from "@/components/CourseCard";
+import { cn } from "@/lib/utils";
 
 export default function Home() {
-  const [data, setData] = useState<any>();
+  const { data: courses, error } = FetchAllCourses();
 
-  const getCourses = async () => {
-    const data = await firebaseCourse.getAllCourse();
-    const courseDataInJson = data.docs.map((item) => {
-      //@ts-ignore
-      return item["_document"]["data"]["value"]["mapValue"]["fields"];
-    });
-
-    setData(courseDataInJson);
-  };
-
-  useEffect(() => {
-    getCourses();
-  }, []);
-
-  console.log(data);
+  console.log(courses);
 
   return (
-    <div className="p-6 flex items-center flex-col">
-      <h2 className="text-5xl font-extrabold bg-gradient-to-b from-gray-200 to-gray-900 bg-clip-text text-transparent my-10">
+    <div className="p-6 flex items-center flex-col gap-16">
+      <h2 className="text-5xl font-extrabold bg-gradient-to-b from-gray-200 to-gray-900 bg-clip-text text-transparent mt-10">
         Practice Your Carrer With Us.
       </h2>
-      <div className="w-full flex">
+      <div className="relative flex w-full items-center justify-center overflow-hidden rounded-lg border bg-black px-5 py-10 md:shadow-xl border-none flex flex-col gap-16">
+        <h2 className="text-5xl font-extrabold whitespace-pre-wrap tracking-tighter bg-gradient-to-b from-gray-200 to-gray-900 bg-clip-text text-transparent">
+          Popular Courses
+        </h2>
+        <div className="z-10 flex flex-wrap w-full px-10 gap-6 items-start justify-center">
+          {courses &&
+            !error &&
+            courses.map((item: any, index: any) => {
+              return <CourseCard courseData={item} key={index} />;
+            })}
+        </div>
+        <AnimatedGridPattern
+          numSquares={30}
+          maxOpacity={0.1}
+          duration={3}
+          repeatDelay={1}
+          className={cn(
+            "[mask-image:radial-gradient(500px_circle_at_center,white,transparent)]",
+            "inset-x-0 inset-y-[-30%] h-[200%] skew-y-12"
+          )}
+        />
+      </div>
+      <div className="w-full flex mb-10">
         <h2 className="text-5xl font-extrabold bg-gradient-to-b from-gray-200 to-gray-900 bg-clip-text text-transparent hover:bg-gradient-to-b hover:from-gray-900 hover:to-gray-200">
           Always You <br />
           are Our First
           <br /> Priority
         </h2>
         <MarqueeDemo />
-      </div>
-      <div className="w-full flex flex-wrap my-10">
-        {data &&
-          data.map((item: any, index: any) => {
-            return (
-              <div key={index} className="p-2 rounded-xl w-2/6 flex flex-col gap-2 border">
-                <img src={item.image.stringValue} alt={""} className="w-full" />
-                <div className="flex flex-col gap-1">
-                  <div>
-                    <h2 className="text-lg font-extrabold">
-                      {item.title.stringValue}
-                    </h2>
-                    <div className="flex justify-between">
-                      <p className="text-lg">
-                        by- <i>{item.instName.stringValue}</i>
-                      </p>
-                      <img
-                        src={item.instImage.stringValue}
-                        width={25}
-                        height={20}
-                        className="rounded-full"
-                      />
-                    </div>
-                  </div>
-                  <p className="w-[200]">{item.message.stringValue}</p>
-                  <Link to={`/course/${item.id.stringValue}`}>
-                    <button className="">see more details</button>
-                  </Link>
-                </div>
-              </div>
-            );
-          })}
       </div>
     </div>
   );

@@ -15,7 +15,7 @@ import InstData from "lib/types/InstData";
 
 export default function Form() {
   const user = useRecoilValue(userAtom);
-  
+
   const [data, setData] = useState<CourseData | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [des, setDes] = useState<string>("");
@@ -67,14 +67,17 @@ export default function Form() {
     e.preventDefault();
     setLoading(true);
     try {
-      if(!data || !file || !des) throw new Error("data can't be null");
+      if (!data || !file || !des) throw new Error("data can't be null");
       const instData: InstData = {
         id: user.id,
         email: user.email,
         name: user.name,
-        photoUrl: user.image
-      }
+        photoUrl: user.image,
+      };
       await firebaseCourse.createCourse(data, file, des, instData);
+      setData(null);
+      setFile(null);
+      setDes("");
     } catch (error) {
       console.log("error while creating the form", error);
     }
