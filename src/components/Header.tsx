@@ -13,7 +13,6 @@ export default function Header() {
   useEffect(() => {
     const subscribe = onAuthStateChanged(firebase.auth, (user: any) => {
       if (user) {
-        console.log(user);
         setUser({
           id: user.uid,
           name: user.displayName,
@@ -28,7 +27,7 @@ export default function Header() {
     return () => subscribe();
   }, []);
 
-  console.log("user: ", user);
+  console.log(user);
 
   return (
     <div className="flex items-center px-6 py-4 justify-between border-b border-gray-600">

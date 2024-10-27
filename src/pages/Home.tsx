@@ -1,11 +1,11 @@
 import { MarqueeDemo } from "@/components/Marquee";
-import FetchAllCourses from "../../lib/hooks/FetchAllC";
+import coursesFetching from "../../lib/hooks/FetchAllC";
 import AnimatedGridPattern from "@/components/ui/animated-grid-pattern";
 import CourseCard from "@/components/CourseCard";
 import { cn } from "@/lib/utils";
 
 export default function Home() {
-  const { data: courses, error } = FetchAllCourses();
+  const { data: courses, error } = coursesFetching.FetchAllCourses();
 
   console.log(courses);
 

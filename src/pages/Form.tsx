@@ -5,21 +5,69 @@ import { useRecoilValue } from "recoil";
 import ShineBorder from "@/components/ui/shine-border";
 import { SelectScrollable } from "@/components/Select";
 import ReactQuill from "react-quill";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "react-quill/dist/quill.snow.css";
 import { RainbowButton } from "@/components/ui/rainbow-button";
 
 import firebaseCourse from "../../lib/serverless/courses";
 import CourseData from "lib/types/courseData";
 import InstData from "lib/types/InstData";
+import { useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function Form() {
   const user = useRecoilValue(userAtom);
+  const [params] = useSearchParams();
+  const courseId = params.getAll("courseId")[0] || null;
 
-  const [data, setData] = useState<CourseData | null>(null);
+  const [data, setData] = useState<CourseData>();
   const [file, setFile] = useState<File | null>(null);
   const [des, setDes] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const navigate = useNavigate();
+
+  const getEditDataSet = async () => {
+    try {
+      const { data: course } = await firebaseCourse.getSpecificCourseData(
+        courseId || ""
+      );
+
+      if (course) {
+        setData({
+          title: course.title,
+          message: course.message,
+          level: course.level,
+          category: course.category,
+          language: course.language,
+          price: course.price,
+          sellPrice: course.sellPrice,
+        });
+        setDes(course.des);
+      } else {
+        throw new Error("no data");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handelEditCourse = async (e: any) => {
+    e.preventDefault();
+    try {
+      if (!data) throw new Error("data is empty");
+      await firebaseCourse.editSpecifcCourse(courseId || "", data, file, des);
+      console.log("course has been edited");
+      navigate("/my-courses");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    if (courseId) {
+      getEditDataSet();
+    }
+  }, []);
 
   if (!user) {
     return (
@@ -75,7 +123,15 @@ export default function Form() {
         photoUrl: user.image,
       };
       await firebaseCourse.createCourse(data, file, des, instData);
-      setData(null);
+      setData({
+        title: "",
+        message: "",
+        level: "",
+        category: "",
+        language: "",
+        price: "",
+        sellPrice: "",
+      });
       setFile(null);
       setDes("");
     } catch (error) {
@@ -95,7 +151,7 @@ export default function Form() {
             Create New Course
           </h1>
           <form
-            onSubmit={handelCreateCourse}
+            onSubmit={courseId ? handelEditCourse : handelCreateCourse}
             className="flex flex-col items-center gap-3 justify-center z-10 text-white w-full"
           >
             <Input
@@ -104,6 +160,7 @@ export default function Form() {
               placeholder="title"
               className="w-5/6"
               required
+              value={data?.title}
               onChange={(e) => handelData("title", e.target.value)}
               disabled={loading}
             />
@@ -111,6 +168,7 @@ export default function Form() {
               placeholder="Type your message here."
               className="w-5/6"
               onChange={(e) => handelData("message", e.target.value)}
+              value={data?.message}
               disabled={loading}
             />
             <div className="w-5/6">
@@ -118,7 +176,6 @@ export default function Form() {
                 id="dropzone-file"
                 type="file"
                 className="w-full border rounded-lg p-2"
-                required
                 onChange={(e) =>
                   setFile(e.target.files ? e.target.files[0] : null)
                 }
@@ -129,16 +186,19 @@ export default function Form() {
               <SelectScrollable
                 title={"category"}
                 items={categories}
+                data={data?.category || ""}
                 handelData={handelData}
               />
               <SelectScrollable
                 title={"level"}
                 items={levels}
+                data={data?.level || ""}
                 handelData={handelData}
               />
               <SelectScrollable
                 title={"language"}
                 items={languages}
+                data={data?.language || ""}
                 handelData={handelData}
               />
             </div>
@@ -160,19 +220,21 @@ export default function Form() {
                 required
                 onChange={(e) => handelData("price", e.target.value)}
                 disabled={loading}
+                value={data?.price}
               />
               <Input
-                type="price"
-                id="price"
+                type="sprice"
+                id="sprice"
                 placeholder="sell-price"
                 className="w-5/6"
                 required
                 onChange={(e) => handelData("sellPrice", e.target.value)}
                 disabled={loading}
+                value={data?.sellPrice}
               />
             </div>
             <RainbowButton type="submit" disabled={loading} className="w-5/6">
-              create
+              {courseId ? "Edit Course" : "Create New Course"}
             </RainbowButton>
           </form>
         </div>

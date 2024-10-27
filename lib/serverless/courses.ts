@@ -2,11 +2,12 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import firebase from "../firebase";
 import {
   collection,
+  deleteDoc,
   doc,
-  Firestore,
-  getDocs,
+  getDoc,
   setDoc,
   Timestamp,
+  updateDoc,
 } from "firebase/firestore";
 import CourseData from "../types/courseData";
 import InstData from "../types/InstData";
@@ -44,14 +45,80 @@ const createCourse = async (
   }
 };
 
-// getting all the course
-const getAllCourse = async () => {
-  const query = collection(firebase.firestore, "courses");
-  const querySnapshot = await getDocs(query);
-  return querySnapshot;
+// handel deleting the course
+const handelDeleteCourse = async (courseId: string) => {
+  if (!courseId) throw new Error("Invlaid course Id");
+  try {
+    const course = await doc(firebase.firestore, "courses", courseId);
+    await deleteDoc(course);
+  } catch (error) {
+    console.log(error);
+  }
 };
 
-// getting myCouses only
-const getAllMyCourse = async () => {};
+const getSpecificCourseData = async (courseId: string) => {
+  if (!courseId) throw new Error("Invlaid course Id");
+  try {
+    const courseRef = await doc(firebase.firestore, "courses", courseId);
+    const courseSnapshot = await getDoc(courseRef);
 
-export default { createCourse, getAllCourse };
+    if (!courseSnapshot.exists()) {
+      throw new Error("Course not found");
+    }
+    return { data: courseSnapshot.data(), error: null };
+  } catch (error) {
+    console.log(error);
+    return { data: null, error: error };
+  }
+};
+
+const editSpecifcCourse = async (
+  courseId: string,
+  data: CourseData,
+  file: File | null,
+  des: string
+) => {
+
+  if (!courseId) throw new Error("Invlaid course Id");
+  const courseRef = await doc(firebase.firestore, "courses", courseId);
+  const course = await getDoc(courseRef);
+
+  try {
+    let imageUrl: string | null = null;
+
+    if (course.exists()) {
+      imageUrl = course.data().image;
+      console.log(course.data());
+    } else {
+      throw new Error("course not exists");
+    }
+
+    if (file) {
+      const newId = await doc(collection(firebase.firestore, "courses")).id;
+      const imageRef = ref(firebase.storage, newId);
+      await uploadBytes(imageRef, file);
+      imageUrl = await getDownloadURL(imageRef);
+    }
+
+    console.log(data);
+
+    await updateDoc(courseRef, {
+      title: data.title || "",
+      message: data.message || "",
+      des: des || "",
+      category: data.category || "",
+      level: data.level || "",
+      language: data.language || "",
+      price: data.price || "",
+      sellPrice: data.sellPrice || "",
+      image: imageUrl || "",
+    });
+
+    console.log('data has been updated!');
+  } catch (error) {
+    console.log(error);
+    throw new Error("error while editing data");
+  }
+};
+
+export default { createCourse, handelDeleteCourse, getSpecificCourseData, editSpecifcCourse };
