@@ -75,7 +75,12 @@ export default function CourseCard({ courseData }: any) {
             </div>
           </div>
         )}
-        <RainbowButton className="w-full">
+        <RainbowButton
+          className="w-full"
+          onClick={() => {
+            navigate(`/course/${courseData.id}`);
+          }}
+        >
           {courseData.instId == user?.id ? "View Course" : "Buy Course"}
         </RainbowButton>
       </CardBody>

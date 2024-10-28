@@ -5,6 +5,8 @@ import Header from "./components/Header";
 import MyCourses from "./pages/MyCourses";
 import Subscription from "./pages/Subscription";
 import Form from "./pages/Form";
+import Course from "./pages/Course";
+import ChapterForm from "./pages/ChapterForm";
 
 function App() {
   return (
@@ -17,6 +19,8 @@ function App() {
             <Route path={"/my-courses"} element={<MyCourses />} />
             <Route path={"/my-courses/form"} element={<Form />} />
             <Route path={"/subscribe"} element={<Subscription />} />
+            <Route path={"/course/:id"} element={<Course />} />
+            <Route path={"/course/chapter-form"} element={<ChapterForm />} />
           </Routes>
         </BrowserRouter>
       </div>
