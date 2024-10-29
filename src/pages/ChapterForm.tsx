@@ -5,22 +5,27 @@ import { RainbowButton } from "@/components/ui/rainbow-button";
 import { Youtube } from "lucide-react";
 import { Link } from "lucide-react";
 import { Image } from "lucide-react";
-import { useState } from "react";
-import "react-quill/dist/quill.snow.css";
+import { useEffect, useState } from "react";
 import ReactQuill from "react-quill";
 import { useNavigate } from "react-router-dom";
+import firebaseChapter from "../../lib/serverless/chapter";
+import { Progress } from "@nextui-org/react";
+import "react-quill/dist/quill.snow.css";
 
 export default function ChapterForm() {
   const [params] = useSearchParams();
   const [fileType, setFileType] = useState("");
+  const [uploadingProgress, setUploadingProgress] = useState(0);
   const [data, setData] = useState<{
     title: string;
     description: string;
   }>();
-  const [file, setFile] = useState<File | null>();
+  const [file, setFile] = useState<File | string | null>();
+  const user = useRecoilValue(userAtom);
+  const id = params?.get("id");
+  const chapterId = params?.get("chapterId");
   const navigate = useNavigate();
 
-  const user = useRecoilValue(userAtom);
   if (!user) {
     return (
       <div className="flex min-h-screen w-full items-center justify-center">
@@ -34,6 +39,63 @@ export default function ChapterForm() {
     );
   }
 
+  if (!id) {
+    return (
+      <div className="flex min-h-screen w-full items-center justify-center">
+        <h1 className="text-2xl font-bold bg-gradient-to-b from-gray-200 to-gray-900 bg-clip-text text-transparent">
+          <span className="text-8xl font-bold bg-gradient-to-b from-gray-200 to-gray-900 bg-clip-text text-transparent">
+            Oops,
+          </span>
+          <br /> No course are selected now to create chapters
+        </h1>
+      </div>
+    );
+  }
+
+  const fetchData = async () => {
+    if (!id && !chapterId) {
+      throw new Error("Either 'id' or 'chapterId' must be provided.");
+    }
+
+    const chapterData = await firebaseChapter.fetchSpecificChapter(
+      id || "",
+      chapterId || ""
+    );
+
+    if (!chapterData) {
+      throw new Error("No data found!");
+    }
+
+    setData({
+      title: chapterData.title,
+      description: chapterData.description,
+    });
+  };
+
+  const handelEditData = async (e: any) => {
+    e.preventDefault();
+    try {
+      if (!id || !chapterId) throw new Error("Invalid Id's");
+      await firebaseChapter.editChapters(
+        chapterId || "",
+        id || "",
+        data,
+        // @ts-ignore
+        file,
+        fileType,
+        (progress: Number) => {
+          // @ts-ignore
+          setUploadingProgress((uploadingProgress: Number) => {
+            return progress;
+          });
+        }
+      );
+      navigate(`/courses/${id}`);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const handelSetData = (key: string, value: string) => {
     setData((data: any) => {
       return {
@@ -44,19 +106,40 @@ export default function ChapterForm() {
   };
   const handelCreateChapter = async (e: any) => {
     e.preventDefault();
-    try{
-
-        navigate(`/course/${params.get('id')}`);
-    }catch(error: any){
-        console.log(error);
+    if (!data || !file || !id) throw new Error("Unable to get the data");
+    try {
+      await firebaseChapter.createChapter({
+        data: data,
+        file: file,
+        fileType: fileType,
+        courseId: id || "",
+        // it is an callback which will returns on resolving = true
+        progressCallBack: (progress: number) => {
+          // updating the usestate with prev data
+          // reason: otherwise it will overwrite at very fast speed so we unable to show on ui
+          setUploadingProgress((uploadingProgress: number) => {
+            console.log(uploadingProgress);
+            return progress;
+          });
+        },
+      });
+      navigate(`/course/${id}`);
+    } catch (error: any) {
+      console.log(error);
     }
-    
+
     setData({
       title: "",
       description: "",
     });
     setFile(null);
   };
+
+  useEffect(() => {
+    if (chapterId && id) {
+      fetchData();
+    }
+  }, []);
 
   // either youtube video upload, video embeed or any thing like image
   return (
@@ -66,7 +149,7 @@ export default function ChapterForm() {
       </h2>
       <form
         className="w-1/3 flex flex-col items-center justify-center gap-2"
-        onSubmit={handelCreateChapter}
+        onSubmit={chapterId ? handelEditData : handelCreateChapter}
       >
         <input
           className="bg-transparent focus:outline-none text-sm py-1 border-2 rounded-lg border-gray-400 text-center w-full"
@@ -152,8 +235,18 @@ export default function ChapterForm() {
             placeholder="enter description of chapter"
           />
         </div>
+        {uploadingProgress > 0 && (
+          <Progress
+            aria-label="Downloading..."
+            size="md"
+            value={Number(uploadingProgress)}
+            color="success"
+            showValueLabel={true}
+            className="max-w-md"
+          />
+        )}
         <RainbowButton className="w-full" type="submit">
-          save
+          {chapterId ? "Edit Chapter" : "Save Chapter"}
         </RainbowButton>
       </form>
     </div>

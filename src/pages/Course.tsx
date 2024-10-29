@@ -6,6 +6,8 @@ import { DocumentData } from "firebase/firestore";
 import { Image } from "@nextui-org/react";
 import Chapters from "@/components/Chapters";
 import Hero from "@/components/Hero";
+import firebaseChapters from "../../lib/hooks/FetchChapters";
+import ChapterCard from "@/components/ChapterCard";
 
 export default function Course() {
   const params = useParams();
@@ -20,13 +22,18 @@ export default function Course() {
     setError(error || null);
   };
 
+  const { data: chapter, error: err } = firebaseChapters.useFetchChapters(
+    {courseId: courseId || ""}
+  );
+
+
   useEffect(() => {
     if (courseId) {
       fetchData();
     }
   }, []);
 
-  if (!course && !error) {
+  if ((!course && !error) || (!chapter && !err)) {
     return (
       <div className="flex items-center justify-center h-screen">
         <CircularProgress label="Loading..." />
@@ -49,8 +56,15 @@ export default function Course() {
 
   return (
     <div className="px-16 flex gap-4 justify-center w-full">
-      <div className="flex flex-col items-center justify-center gap-4 w-9/12">
+      <div className="flex flex-col items-center justify-center gap-4 w-9/12 mb-10">
         <Hero course={course} />
+        <h2 className="text-2xl w-full">Chapters</h2>
+        <div className="flex flex-col gap-2 w-full">
+          {chapter &&
+            chapter?.map((chapt: any, index: any) => {
+              return <ChapterCard chapter={chapt} key={index} />;
+            })}
+        </div>
       </div>
       <div className="w-3/12 flex flex-col gap-4 items-center h-fit py-4">
         <div className="px-4 border-l-2 border-gray-600 w-full py-2 flex flex-col gap-2">
@@ -73,7 +87,7 @@ export default function Course() {
           </p>
         </div>
         <div className="border-l-2 border-gray-600 px-4 w-full flex flex-col gap-4 items-center h-fit">
-          <Chapters courseInstId={course?.instId} courseId={course?.id}/>
+          <Chapters courseInstId={course?.instId} courseId={course?.id} chapters={chapter}/>
         </div>
       </div>
     </div>
