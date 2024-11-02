@@ -26,6 +26,32 @@ export default function MyCourses() {
     );
   }
 
+  if(error){
+    return (
+      <div className="flex min-h-screen w-full items-center justify-center">
+        <h1 className="text-2xl font-bold bg-gradient-to-b from-gray-200 to-gray-900 bg-clip-text text-transparent">
+          <span className="text-8xl font-bold bg-gradient-to-b from-gray-200 to-gray-900 bg-clip-text text-transparent">
+            505 Oops,
+          </span>
+          <br /> There is some error on server side.
+        </h1>
+      </div>
+    );
+  }
+
+  if(!courses){
+    return (
+      <div className="flex min-h-screen w-full items-center justify-center">
+        <h1 className="text-2xl font-bold bg-gradient-to-b from-gray-200 to-gray-900 bg-clip-text text-transparent">
+          <span className="text-8xl font-bold bg-gradient-to-b from-gray-200 to-gray-900 bg-clip-text text-transparent">
+            No Course Found,
+          </span>
+          <br /> Purchase courses from the Best Educators.
+        </h1>
+      </div>
+    );
+  }
+
   return (
     <div className="items-center h-full w-full p-6">
       <div className="flex justify-between items-center">
@@ -35,7 +61,7 @@ export default function MyCourses() {
         </Link>
       </div>
       <div className="relative w-full overflow-hidden">
-        <div className="flex justify-center flex-wrap gap-5 my-10 z-10">
+        <div className="flex-col md:flex-row items-center md:flex-wrap flex justify-center gap-5 my-10 z-10 w-full">
           {error && (
             <div className="text-2xl font-bold bg-gradient-to-b from-gray-200 to-gray-900 bg-clip-text text-transparent">
               <span className="text-8xl font-bold bg-gradient-to-b from-gray-200 to-gray-900 bg-clip-text text-transparent">

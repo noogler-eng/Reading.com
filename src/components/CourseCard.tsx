@@ -26,9 +26,9 @@ export default function CourseCard({ courseData }: any) {
   };
 
   return (
-    <Card className="py-2 w-3/12 bg-[#181818] text-white z-10">
+    <Card className="py-2 w-full md:w-3/12 bg-[#181818] text-white z-10">
       <CardHeader className="pb-0 px-4 flex-col items-start gap-3">
-        <p className="text-tiny uppercase font-bold">
+        <p className="text-sm md:text-tiny uppercase font-bold">
           <Badge variant="default">{courseData.category}</Badge>
         </p>
         <div className="flex gap-2 w-full items-center justify-between">
@@ -53,7 +53,7 @@ export default function CourseCard({ courseData }: any) {
           )}
         </div>
         <h4 className="font-bold text-large">
-          {courseData.title.slice(0, 60)}...
+          {courseData.title.slice(0, 40)}...
         </h4>
       </CardHeader>
       <CardBody className="overflow-visible py-2 w-full flex flex-col gap-2">
@@ -61,7 +61,7 @@ export default function CourseCard({ courseData }: any) {
           <Image
             isZoomed
             alt="Card background"
-            className="object-cover rounded-xl w-fit"
+            className="object-cover rounded-xl w-fit max-h-[170px]"
             src={courseData.image}
             width={""}
             onClick={() => setIsOpen(!isOpen)}

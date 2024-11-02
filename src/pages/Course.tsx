@@ -8,6 +8,7 @@ import Chapters from "@/components/Chapters";
 import Hero from "@/components/Hero";
 import firebaseChapters from "../../lib/hooks/FetchChapters";
 import ChapterCard from "@/components/ChapterCard";
+import { RainbowButton } from "@/components/ui/rainbow-button";
 
 export default function Course() {
   const params = useParams();
@@ -89,6 +90,7 @@ export default function Course() {
         <div className="border-l-2 border-gray-600 px-4 w-full flex flex-col gap-4 items-center h-fit">
           <Chapters courseInstId={course?.instId} courseId={course?.id} chapters={chapter}/>
         </div>
+        <RainbowButton className="w-full">Buy Course</RainbowButton>
       </div>
     </div>
   );
