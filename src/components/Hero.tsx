@@ -1,4 +1,3 @@
-import { RainbowButton } from "./ui/rainbow-button";
 import SparklesText from "@/components/ui/sparkles-text";
 import { BookA } from "lucide-react";
 import { AudioLines } from 'lucide-react';
@@ -51,7 +50,6 @@ export default function Hero({ course }: any) {
           className="flex flex-col gap-2 p-1"
         />
       </div>
-      <RainbowButton className="w-fit">buy course</RainbowButton>
     </div>
   );
 }

@@ -9,9 +9,13 @@ import Hero from "@/components/Hero";
 import firebaseChapters from "../../lib/hooks/FetchChapters";
 import ChapterCard from "@/components/ChapterCard";
 import { RainbowButton } from "@/components/ui/rainbow-button";
+import { useRecoilValue } from "recoil";
+import userAtom from "../../store/user/userAtom";
+import firebaseUser from "../../lib/serverless/user";
 
 export default function Course() {
   const params = useParams();
+  const user = useRecoilValue(userAtom);
   const [course, setCourse] = useState<DocumentData | null>();
   const [error, setError] = useState<{} | null>();
   const courseId = params.id;
@@ -33,6 +37,18 @@ export default function Course() {
       fetchData();
     }
   }, []);
+
+  const isPurchased = course && course?.purchasers?.includes(user?.id);
+
+  async function handelBuy(){
+    if(!user?.id || !courseId || !user?.name || !user?.email || !user?.image) {
+      
+      return;
+    }
+
+    console.log('purchasing the course!');
+    await firebaseUser.purchaseCourse(courseId, user?.id, user?.name, user?.email, user?.image);
+  }
 
   if ((!course && !error) || (!chapter && !err)) {
     return (
@@ -90,7 +106,7 @@ export default function Course() {
         <div className="border-l-2 border-gray-600 px-4 w-full flex flex-col gap-4 items-center h-fit">
           <Chapters courseInstId={course?.instId} courseId={course?.id} chapters={chapter}/>
         </div>
-        <RainbowButton className="w-full">Buy Course</RainbowButton>
+        {!isPurchased && <RainbowButton className="w-full" onClick={handelBuy} disabled={!user}>{"Buy Now"}</RainbowButton>}
       </div>
     </div>
   );

@@ -26,7 +26,7 @@ export default function MyCourses() {
     );
   }
 
-  if(error){
+  if (error) {
     return (
       <div className="flex min-h-screen w-full items-center justify-center">
         <h1 className="text-2xl font-bold bg-gradient-to-b from-gray-200 to-gray-900 bg-clip-text text-transparent">
@@ -39,14 +39,20 @@ export default function MyCourses() {
     );
   }
 
-  if(!courses){
+  if (!courses || courses?.length == 0) {
     return (
-      <div className="flex min-h-screen w-full items-center justify-center">
-        <h1 className="text-2xl font-bold bg-gradient-to-b from-gray-200 to-gray-900 bg-clip-text text-transparent">
+      <div className="flex min-h-screen w-full items-center flex-col p-10 ">
+        <div className="flex justify-between items-center w-full">
+          <h1 className="text-3xl font-semibold underline">My Courses</h1>
+          <Link to="/my-courses/form">
+            <Button variant="secondary">create new course</Button>
+          </Link>
+        </div>
+        <h1 className="text-2xl font-bold bg-gradient-to-b from-gray-200 to-gray-900 bg-clip-text text-transparent mt-24">
           <span className="text-8xl font-bold bg-gradient-to-b from-gray-200 to-gray-900 bg-clip-text text-transparent">
             No Course Found,
           </span>
-          <br /> Purchase courses from the Best Educators.
+          <br /> create courses as you are the Best Educators.
         </h1>
       </div>
     );

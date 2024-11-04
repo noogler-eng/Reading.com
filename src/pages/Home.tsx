@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils";
 import { useRecoilValue } from "recoil";
 import userAtom from "../../store/user/userAtom";
 import { useState } from "react";
-import { Search } from 'lucide-react';
 
 
 export default function Home() {
@@ -14,35 +13,30 @@ export default function Home() {
   const user = useRecoilValue(userAtom);
   const [search, setSearch] = useState("");
 
-  const handelSearch = async () => {};
+  const searched = courses && courses.filter((items: any) => {
+    return items.title.toUpperCase().includes(search.toUpperCase());
+  });
 
   return (
     <div className="p-6 flex items-center flex-col gap-4">
       <div className="bg-[url('/hero.png')] w-full bg-no-repeat	bg-cover bg-center bg-fixed	bg-clip-content	h-[650px] flex items-center justify-center rounded-xl">
-        <form
-          className="flex flex-col items-center justify-center gap-2 w-full"
-          onSubmit={handelSearch}
-        >
-          <h1 className="text-2xl text-black font-extrabold">All the Skills you need in One place</h1>
+        <div className="flex flex-col items-center justify-center gap-2 w-full">
+          <h1 className="text-2xl text-black font-extrabold">
+            All the Skills you need in One place
+          </h1>
           <input
             type="text"
-            className="rounded-xl py-1 px-4 text-center w-1/2 text-black"
+            className="rounded-xl py-1 px-4 text-center w-1/2 text-white bg-black/70 focus:outline-none"
             placeholder="search here? what you are looking for?"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <button
-            className="w-1/4 bg-black/70 py-1 px-4 rounded-xl flex items-center gap-1 justify-between"
-            type="submit"
-          >
-            <Search size={18}/> search
-          </button>
-        </form>
+        </div>
       </div>
       <div className="flex flex-col gap-4 mt-4 w-full items-center">
         {user && (
           <h1 className="text-6xl place-start w-full font-extrabold">
-            Welome,{" "}
+            Welcome,{" "}
             <span className="bg-green-500 bg-clip-text text-transparent">
               {user.name}
             </span>
@@ -69,9 +63,13 @@ export default function Home() {
         <div className="z-10 flex flex-wrap w-full md:px-10 gap-6 items-start justify-center">
           {courses &&
             !error &&
-            courses.map((item: any, index: any) => {
-              return <CourseCard courseData={item} key={index} />;
-            })}
+            (searched.length > 0
+              ? searched.map((item: any, index: any) => {
+                  return <CourseCard courseData={item} key={index} />;
+                })
+              : courses.map((item: any, index: any) => {
+                  return <CourseCard courseData={item} key={index} />;
+                }))}
         </div>
         <AnimatedGridPattern
           numSquares={100}
