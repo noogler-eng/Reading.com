@@ -1,9 +1,12 @@
 import { RecoilRoot } from "recoil";
-import {NextUIProvider} from '@nextui-org/react'
+import { NextUIProvider } from "@nextui-org/react";
+import { ThemeProvider } from "./ThemeProvider";
 export default function Provider({ children }: { children: React.ReactNode }) {
   return (
-    <RecoilRoot>
-      <NextUIProvider>{children}</NextUIProvider>
-    </RecoilRoot>
+    <ThemeProvider>
+      <RecoilRoot>
+        <NextUIProvider>{children}</NextUIProvider>
+      </RecoilRoot>
+    </ThemeProvider>
   );
 }
